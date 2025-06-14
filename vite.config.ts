@@ -13,7 +13,7 @@ export default defineConfig(({ mode }) => {
       const { componentTagger } = require("lovable-tagger");
       plugins.push(componentTagger());
     } catch (error) {
-      console.warn("lovable-tagger not available:", error.message);
+      console.warn("lovable-tagger not available:", error instanceof Error ? error.message : String(error));
     }
   }
 
