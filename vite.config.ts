@@ -4,29 +4,29 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }) => ({
-  server: {
-    host: "::",
-    port: 8080,
-  },
-  plugins: [
-    react(),
-    // Only include lovable-tagger in development mode
-    ...(mode === 'development' ? [
-      (async () => {
-        try {
-          const { componentTagger } = await import("lovable-tagger");
-          return componentTagger();
-        } catch (error) {
-          console.warn("lovable-tagger not available in production");
-          return null;
-        }
-      })()
-    ] : [])
-  ].filter(Boolean),
-  resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "./src"),
+export default defineConfig(({ mode }) => {
+  const plugins = [react()];
+  
+  // Only include lovable-tagger in development mode
+  if (mode === 'development') {
+    try {
+      const { componentTagger } = require("lovable-tagger");
+      plugins.push(componentTagger());
+    } catch (error) {
+      console.warn("lovable-tagger not available:", error.message);
+    }
+  }
+
+  return {
+    server: {
+      host: "::",
+      port: 8080,
     },
-  },
-}));
+    plugins,
+    resolve: {
+      alias: {
+        "@": path.resolve(__dirname, "./src"),
+      },
+    },
+  };
+});
